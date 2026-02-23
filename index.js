@@ -25,6 +25,7 @@ async function run() {
         await client.connect();
 
         const coffeesCollection = client.db("espressoDB").collection("coffees");
+        const usersCollection = client.db("espressoDB").collection("users");
 
         app.get('/coffees', async (req, res) => {
             const result = await coffeesCollection.find().toArray();
@@ -47,12 +48,12 @@ async function run() {
 
         app.put('/updateCoffee/:id', async (req, res) => {
             const id = req.params.id;
-            const filter = {_id: new ObjectId(id)};
+            const filter = { _id: new ObjectId(id) };
             const updatedCoffee = req.body;
             const updateDoc = {
                 $set: updatedCoffee,
             };
-            const result = await coffeesCollection.updateOne(filter,updateDoc);
+            const result = await coffeesCollection.updateOne(filter, updateDoc);
             res.send(result);
         })
 
@@ -63,6 +64,12 @@ async function run() {
             res.send(result)
         })
 
+        //user related API's
+        app.post("/users", async (req, res) => {
+            const userProfile = req.body;
+            const result = await usersCollection.insertOne(userProfile);
+            res.send(result);
+        })
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
