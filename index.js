@@ -10,7 +10,6 @@ app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.q3bebek.mongodb.net/?appName=Cluster0`;
 
-// Create a MongoClient
 const client = new MongoClient(uri, {
     serverApi: {
         version: ServerApiVersion.v1,
@@ -19,16 +18,15 @@ const client = new MongoClient(uri, {
     }
 });
 
-// ✅ Database collections আগেই declare করুন
+// ✅ Collections বাইরে declare করুন
 const coffeesCollection = client.db("espressoDB").collection("coffees");
 const usersCollection = client.db("espressoDB").collection("users");
 
-// ✅ Root route
+// ✅ সব Route বাইরে — synchronously register হবে
 app.get('/', (req, res) => {
     res.send("Espresso Emporium server is running");
 });
 
-// ✅ সব route গুলো এখন বাইরে
 app.get('/coffees', async (req, res) => {
     const result = await coffeesCollection.find().toArray();
     res.send(result);
@@ -51,9 +49,7 @@ app.put('/updateCoffee/:id', async (req, res) => {
     const id = req.params.id;
     const filter = { _id: new ObjectId(id) };
     const updatedCoffee = req.body;
-    const updateDoc = {
-        $set: updatedCoffee,
-    };
+    const updateDoc = { $set: updatedCoffee };
     const result = await coffeesCollection.updateOne(filter, updateDoc);
     res.send(result);
 });
@@ -65,7 +61,6 @@ app.delete('/coffees/:id', async (req, res) => {
     res.send(result);
 });
 
-// User related API's
 app.get('/users', async (req, res) => {
     const result = await usersCollection.find().toArray();
     res.send(result);
@@ -80,11 +75,7 @@ app.post("/users", async (req, res) => {
 app.patch('/user', async (req, res) => {
     const { email, lastSignInTime } = req.body;
     const filter = { email: email };
-    const updateDoc = {
-        $set: {
-            lastSignInTime: lastSignInTime
-        }
-    };
+    const updateDoc = { $set: { lastSignInTime: lastSignInTime } };
     const result = await usersCollection.updateOne(filter, updateDoc);
     res.send(result);
 });
