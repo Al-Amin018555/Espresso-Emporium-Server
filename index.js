@@ -114,3 +114,5 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(`Espresso Emporium server is running on port ${port}`);
 })
+
+module.exports = app;
